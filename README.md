@@ -13,40 +13,69 @@ If you're seeing this, you've probably already done this step. Congrats!
 
 A browser-only SvelteKit app for translators who batch review CSV rows, send them to ChatGPT, and compare the revised targets with word-level diffs—styled with Tailwind CSS v4 and fully TypeScripted.
 
-## Features
+## Workflow
 
-- Upload a CSV (columns: `Index`, `Source`, `Target`) and preview the first rows locally via PapaParse.
-- Configure batch size + page, auto-slice the selected rows, and display the current batch table with range labels.
-- Generate a JSON payload for ChatGPT:
+### 1. Read CSV
 
-	```json
-	{
-		"meta": { "batchSize": 10, "batchIndex": 1, "totalRows": 42 },
-		"rows": [
-			{ "index": 1, "source": "…", "target": "…" }
-		]
-	}
-	```
+Upload a CSV file containing at least two columns:
 
-- Paste ChatGPT’s JSON response back in and parse/validate it. Expected response schema:
+- `source` – Japanese source text  
+- `target` – German translation (the version we want to refine)
 
-	```json
-	{
-		"rows": [
-			{
-				"index": 1,
-				"source_original": "…",
-				"target_original": "…",
-				"target_revised": "…"
-			}
-		]
-	}
-	```
+The app parses the file entirely in the browser and shows a quick preview so you know you grabbed the right document.
 
-- Render per-row cards showing the original vs. revised target plus a color-coded word diff (equal / removed / added).
-- Toggle a Dracula-inspired dark mode, collapse noisy panels by default, and automatically persist your latest CSV data, batch settings, payloads, and diffs to `localStorage` for instant reloads.
+### 2. Batch & generate JSON
 
-Everything happens in the browser—no API keys, servers, or network calls.
+Rows are sliced into batches and converted into a JSON request that you can drop straight into an LLM like ChatGPT. Every request carries the batch metadata plus the original strings so the model has full context.
+
+```json
+{
+  "meta": {
+    "batchSize": 10,
+    "batchIndex": 1,
+    "totalRows": 42
+  },
+  "rows": [
+    {
+      "index": 1,
+      "source_original": "...",
+      "target_original": "..."
+    }
+  ]
+}
+```
+
+### 3. LLM check & rewrite
+
+Feed that JSON to your LLM of choice. For each row it should:
+
+- verify the German target translates the Japanese source accurately
+- enforce the desired tone/style
+- rewrite the German to sound natural and human
+- fix spelling, grammar, and punctuation
+
+The LLM responds with a minimal JSON payload:
+
+```json
+{
+  "rows": [
+    {
+      "index": 1,
+      "target_revised": "..."
+    }
+  ]
+}
+```
+
+### 4. Diff view rendering
+
+Paste the response back into the tool. For every row you’ll see:
+
+- the original target text (from the CSV)
+- the revised target text (from the LLM)
+- a word-level diff highlighting insertions, deletions, and changes
+
+Toggle sections open to read the full sentences, or scan the diff tokens to spot issues at a glance. Everything stays client-side—no APIs, logins, or external servers involved.
 
 ## Tech Stack
 
