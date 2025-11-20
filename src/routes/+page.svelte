@@ -57,6 +57,16 @@
   });
 
   $effect(() => {
+    const text = diffState.responseJson?.trim() ?? "";
+    if (!text) {
+      diffState.diffRows = [];
+      diffState.responseError = "";
+      return;
+    }
+    parseResponse();
+  });
+
+  $effect(() => {
     if (typeof window === "undefined") return;
     persistDiffState();
   });
