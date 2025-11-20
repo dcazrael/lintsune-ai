@@ -5,7 +5,7 @@
   import ThemeToggleButton from "$lib/components/ThemeToggleButton.svelte";
   import type { TranslationRow } from "$lib/types";
   import {
-    workspace,
+    diffState,
     handleRowsLoaded,
     handleBatchSizeInput,
     handleBatchIndexInput,
@@ -14,26 +14,26 @@
     generatePayload,
     handleResponseChange,
     parseResponse,
-  } from "$lib/state/workspace.svelte";
+  } from "$lib/state/diffState.svelte";
   import { useTheme } from "$lib/state/theme.svelte";
   import { Database, MoveUp } from "@lucide/svelte";
 
-  const totalRows = $derived(workspace.rows.length);
-  const maxBatchIndex = $derived(Math.max(1, Math.ceil(totalRows / Math.max(1, workspace.batchSize || 1))));
+  const totalRows = $derived(diffState.rows.length);
+  const maxBatchIndex = $derived(Math.max(1, Math.ceil(totalRows / Math.max(1, diffState.batchSize || 1))));
   const currentBatchRows = $derived((() => {
-    if (!workspace.rows.length) return [] as TranslationRow[];
-    const start = Math.max(0, (workspace.batchIndex - 1) * workspace.batchSize);
-    return workspace.rows.slice(start, start + workspace.batchSize);
+    if (!diffState.rows.length) return [] as TranslationRow[];
+    const start = Math.max(0, (diffState.batchIndex - 1) * diffState.batchSize);
+    return diffState.rows.slice(start, start + diffState.batchSize);
   })());
   const batchRangeLabel = $derived((() => {
-    if (!workspace.rows.length) return "No rows loaded yet.";
+    if (!diffState.rows.length) return "No rows loaded yet.";
     if (!currentBatchRows.length) return "This batch is empty.";
-    const first = (workspace.batchIndex - 1) * workspace.batchSize + 1;
+    const first = (diffState.batchIndex - 1) * diffState.batchSize + 1;
     const last = first + currentBatchRows.length - 1;
     return `Showing rows ${first}–${last} of ${totalRows}`;
   })());
   const isGenerateDisabled = $derived(!currentBatchRows.length);
-  const isParseDisabled = $derived(!workspace.responseJson.trim().length);
+  const isParseDisabled = $derived(!diffState.responseJson.trim().length);
   const theme = useTheme();
 
   function scrollToTop() {
@@ -72,8 +72,8 @@
         />
 
         <BatchControlsCard
-          batchSize={workspace.batchSize}
-          batchIndex={workspace.batchIndex}
+          batchSize={diffState.batchSize}
+          batchIndex={diffState.batchIndex}
           maxBatchIndex={maxBatchIndex}
           hasRows={!!totalRows}
           rangeLabel={batchRangeLabel}
@@ -85,18 +85,18 @@
       </div>
       <div class="col-span-2 gap-6 grid">
         <PayloadPanel
-          payloadJson={workspace.payloadJson}
-          responseJson={workspace.responseJson}
+          payloadJson={diffState.payloadJson}
+          responseJson={diffState.responseJson}
           isGenerateDisabled={isGenerateDisabled}
           isParseDisabled={isParseDisabled}
-          responseError={workspace.responseError}
+          responseError={diffState.responseError}
           onGenerate={generatePayload}
           onResponseChange={handleResponseChange}
           onParse={parseResponse}
         />
         <div class="flex flex-wrap gap-2">
-          <span class="chip">Batch size: {workspace.batchSize}</span>
-          <span class="chip">Current batch: #{workspace.batchIndex}</span>
+          <span class="chip">Batch size: {diffState.batchSize}</span>
+          <span class="chip">Current batch: #{diffState.batchIndex}</span>
           <span class="chip">{batchRangeLabel}</span>
         </div>
       </div>
@@ -104,7 +104,7 @@
   </header>
 
   <main class="grid gap-6 max-w-10/12 mx-auto">
-    <DiffList rows={workspace.diffRows} />
+    <DiffList rows={diffState.diffRows} />
   </main>
 </div>
 <button
