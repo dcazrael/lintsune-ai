@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Light mode tokens */
+@theme {
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+
+  /* Dracula-inspired palette */
+  --background: #f8f8f2;
+  --foreground: #282a36;
+  --muted: #44475a;
+  --selection: #d7dbff;
+  --accent: #ff79c6;
+  --accent-strong: #bd93f9;
+
+  --color-canvas: #f8f8f2;
+  --color-panel: #ffffff;
+  --color-panel-muted: #f2f2ff;
+  --color-stroke: #dcdff1;
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: color-mix(in srgb, var(--accent-strong) 25%, white);
+  --color-selection: var(--selection);
+}
+
+/* Dark mode overrides */
+.dark {
+  --background: #0f101b;
+  --foreground: #f8f8f2;
+  --muted: #96a1d0;
+  --selection: #44475a;
+  --accent: #ff79c6;
+  --accent-strong: #bd93f9;
+
+  --color-canvas: #0b0c16;
+  --color-panel: #1a1c2c;
+  --color-panel-muted: #24273a;
+  --color-stroke: #34374a;
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: #44475a;
+  --color-selection: var(--selection);
+}
+
+
+@layer base {
+  :root {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    @apply bg-canvas text-foreground antialiased min-h-screen;
+    background-image: radial-gradient(circle at top, color-mix(in srgb, var(--color-accent) 24%, transparent) 0%, transparent 55%);
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-panel;
+  }
+
+  ::selection {
+    background-color: var(--color-selection);
+    color: var(--color-foreground);
+  }
+}
+
+@layer components {
+  .panel {
+    @apply border border-stroke/70 bg-panel/95 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.25)] ring-1 ring-white/5 backdrop-blur;
+    background-image: linear-gradient(130deg, color-mix(in srgb, var(--color-accent) 10%, transparent) 0%, transparent 60%);
+  }
+
+  .panel-hero {
+    @apply relative overflow-hidden;
+  }
+
+  .panel-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent) 25%, transparent), transparent 60%);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .panel-hero > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel-muted {
+    background-image: linear-gradient(145deg, color-mix(in srgb, var(--color-panel-muted) 90%, transparent) 0%, color-mix(in srgb, var(--color-panel) 80%, transparent) 80%);
+    @apply border-stroke/50;
+  }
+
+  header .panel {
+    @apply rounded-lg;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-stroke/60 bg-panel-muted/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-muted;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-2xl border border-stroke/70 bg-panel px-4 py-2 text-sm font-semibold text-foreground shadow-[0_10px_30px_rgba(0,0,0,0.25)] transition hover:-translate-y-0.5 hover:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-panel disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:border-stroke;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white hover:bg-accent/90;
+  }
+
+  .btn-secondary {
+    @apply bg-panel-muted text-foreground;
+  }
+
+  .btn-icon {
+    @apply inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke/70 bg-panel text-accent shadow-[0_15px_35px_rgba(0,0,0,0.4)] transition hover:-translate-y-0.5 hover:border-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-panel;
+  }
+
+  .input-field {
+    @apply w-full rounded-2xl border border-stroke/60 bg-panel-muted px-4 py-3 text-sm font-medium text-foreground shadow-inner shadow-black/5 transition placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent;
+  }
+
+}
