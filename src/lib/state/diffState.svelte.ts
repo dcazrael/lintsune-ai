@@ -7,6 +7,7 @@ import type {
 } from "$lib/types";
 import { computeWordDiff } from "$lib/utils/diff";
 
+const STORAGE_KEY = "lintsune-diff-state";
 const DEFAULT_BATCH_SIZE = 10;
 const DEFAULT_BATCH_INDEX = 1;
 
@@ -37,7 +38,10 @@ export function handleBatchSizeInput(event: Event) {
 
 export function handleBatchIndexInput(event: Event) {
   const value = Number((event.currentTarget as HTMLInputElement).value) || DEFAULT_BATCH_INDEX;
-  const maxIndex = Math.max(1, Math.ceil(diffState.rows.length / Math.max(1, diffState.batchSize || 1)));
+  const maxIndex = Math.max(
+    1,
+    Math.ceil(diffState.rows.length / Math.max(1, diffState.batchSize || 1))
+  );
   diffState.batchIndex = Math.min(Math.max(1, value), maxIndex);
 }
 
@@ -46,7 +50,10 @@ export function goToPreviousBatch() {
 }
 
 export function goToNextBatch() {
-  const maxIndex = Math.max(1, Math.ceil(diffState.rows.length / Math.max(1, diffState.batchSize || 1)));
+  const maxIndex = Math.max(
+    1,
+    Math.ceil(diffState.rows.length / Math.max(1, diffState.batchSize || 1))
+  );
   diffState.batchIndex = Math.min(maxIndex, diffState.batchIndex + 1);
 }
 
@@ -74,6 +81,38 @@ export function generatePayload() {
 export function handleResponseChange(nextValue: string) {
   diffState.responseJson = nextValue;
   diffState.responseError = "";
+}
+
+export function loadDiffState() {
+  if (typeof window === "undefined") return;
+  const saved = window.localStorage.getItem(STORAGE_KEY);
+  if (!saved) return;
+  try {
+    const parsed = JSON.parse(saved) as Partial<typeof diffState>;
+    diffState.rows = parsed.rows ?? diffState.rows;
+    diffState.batchSize = parsed.batchSize ?? diffState.batchSize;
+    diffState.batchIndex = parsed.batchIndex ?? diffState.batchIndex;
+    diffState.payloadJson = parsed.payloadJson ?? diffState.payloadJson;
+    diffState.responseJson = parsed.responseJson ?? diffState.responseJson;
+    diffState.responseError = parsed.responseError ?? diffState.responseError;
+    diffState.diffRows = parsed.diffRows ?? diffState.diffRows;
+  } catch (error) {
+    console.error("Failed to restore diff state", error);
+  }
+}
+
+export function persistDiffState() {
+  if (typeof window === "undefined") return;
+  const snapshot = {
+    rows: diffState.rows,
+    batchSize: diffState.batchSize,
+    batchIndex: diffState.batchIndex,
+    payloadJson: diffState.payloadJson,
+    responseJson: diffState.responseJson,
+    responseError: diffState.responseError,
+    diffRows: diffState.diffRows,
+  } satisfies typeof diffState;
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
 }
 
 export function parseResponse() {

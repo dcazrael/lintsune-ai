@@ -1,4 +1,6 @@
 <script lang="ts">
+  import JsonViewer from "./components/JsonViewer.svelte";
+
   let {
     payloadJson = "",
     responseJson = "",
@@ -70,6 +72,11 @@
       </div>
     </div>
 
+    <JsonViewer
+      data={payloadJson}
+      spaces={2}
+      class="h-60 overflow-auto rounded-2xl border border-stroke/60 bg-panel p-3 font-mono text-sm text-foreground"
+    />
     <textarea
       class="input-field mt-2 h-60 font-mono"
       value={payloadJson}

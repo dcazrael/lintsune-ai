@@ -3,38 +3,50 @@
   import BatchControlsCard from "$lib/components/BatchControlsCard.svelte";
   import StatCard from "$lib/components/StatCard.svelte";
   import ThemeToggleButton from "$lib/components/ThemeToggleButton.svelte";
-  import type { TranslationRow } from "$lib/types";
   import {
     diffState,
-    handleRowsLoaded,
-    handleBatchSizeInput,
-    handleBatchIndexInput,
-    goToPreviousBatch,
-    goToNextBatch,
     generatePayload,
+    goToNextBatch,
+    goToPreviousBatch,
+    handleBatchIndexInput,
+    handleBatchSizeInput,
     handleResponseChange,
+    handleRowsLoaded,
+    loadDiffState,
     parseResponse,
+    persistDiffState,
   } from "$lib/state/diffState.svelte";
   import { useTheme } from "$lib/state/theme.svelte";
+  import type { TranslationRow } from "$lib/types";
   import { Database, MoveUp } from "@lucide/svelte";
 
   const totalRows = $derived(diffState.rows.length);
-  const maxBatchIndex = $derived(Math.max(1, Math.ceil(totalRows / Math.max(1, diffState.batchSize || 1))));
-  const currentBatchRows = $derived((() => {
-    if (!diffState.rows.length) return [] as TranslationRow[];
-    const start = Math.max(0, (diffState.batchIndex - 1) * diffState.batchSize);
-    return diffState.rows.slice(start, start + diffState.batchSize);
-  })());
-  const batchRangeLabel = $derived((() => {
-    if (!diffState.rows.length) return "No rows loaded yet.";
-    if (!currentBatchRows.length) return "This batch is empty.";
-    const first = (diffState.batchIndex - 1) * diffState.batchSize + 1;
-    const last = first + currentBatchRows.length - 1;
-    return `Showing rows ${first}–${last} of ${totalRows}`;
-  })());
+  const maxBatchIndex = $derived(
+    Math.max(1, Math.ceil(totalRows / Math.max(1, diffState.batchSize || 1)))
+  );
+  const currentBatchRows = $derived(
+    (() => {
+      if (!diffState.rows.length) return [] as TranslationRow[];
+      const start = Math.max(0, (diffState.batchIndex - 1) * diffState.batchSize);
+      return diffState.rows.slice(start, start + diffState.batchSize);
+    })()
+  );
+  const batchRangeLabel = $derived(
+    (() => {
+      if (!diffState.rows.length) return "No rows loaded yet.";
+      if (!currentBatchRows.length) return "This batch is empty.";
+      const first = (diffState.batchIndex - 1) * diffState.batchSize + 1;
+      const last = first + currentBatchRows.length - 1;
+      return `Showing rows ${first}–${last} of ${totalRows}`;
+    })()
+  );
   const isGenerateDisabled = $derived(!currentBatchRows.length);
   const isParseDisabled = $derived(!diffState.responseJson.trim().length);
   const theme = useTheme();
+
+  if (typeof window !== "undefined") {
+    loadDiffState();
+  }
 
   $effect(() => {
     if (typeof document === "undefined") return;
@@ -42,6 +54,11 @@
     if (typeof window !== "undefined") {
       window.localStorage.setItem("lintsune-theme", theme.theme);
     }
+  });
+
+  $effect(() => {
+    if (typeof window === "undefined") return;
+    persistDiffState();
   });
 
   function scrollToTop() {
@@ -60,7 +77,7 @@
         </h1>
         <p class="text-sm text-muted">
           Upload translation rows, craft JSON payloads, and visualize word-level diffs for every
-        revision without leaving the browser.
+          revision without leaving the browser.
         </p>
       </div>
 
@@ -82,7 +99,7 @@
         <BatchControlsCard
           batchSize={diffState.batchSize}
           batchIndex={diffState.batchIndex}
-          maxBatchIndex={maxBatchIndex}
+          {maxBatchIndex}
           hasRows={!!totalRows}
           rangeLabel={batchRangeLabel}
           onBatchSizeInput={handleBatchSizeInput}
@@ -95,8 +112,8 @@
         <PayloadPanel
           payloadJson={diffState.payloadJson}
           responseJson={diffState.responseJson}
-          isGenerateDisabled={isGenerateDisabled}
-          isParseDisabled={isParseDisabled}
+          {isGenerateDisabled}
+          {isParseDisabled}
           responseError={diffState.responseError}
           onGenerate={generatePayload}
           onResponseChange={handleResponseChange}
@@ -123,4 +140,3 @@
 >
   <MoveUp />
 </button>
-  const theme = useTheme();
