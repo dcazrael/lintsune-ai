@@ -12,12 +12,6 @@ if (typeof window !== "undefined") {
   }
 }
 
-$effect(() => {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(THEME_KEY, themeState.value);
-  document.documentElement.classList.toggle("dark", themeState.value === "dark");
-});
-
 export function useTheme() {
   return {
     get theme() {

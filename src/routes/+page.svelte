@@ -36,6 +36,14 @@
   const isParseDisabled = $derived(!diffState.responseJson.trim().length);
   const theme = useTheme();
 
+  $effect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.classList.toggle("dark", theme.theme === "dark");
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("lintsune-theme", theme.theme);
+    }
+  });
+
   function scrollToTop() {
     if (typeof window === "undefined") return;
     window.scrollTo({ top: 0, behavior: "smooth" });
