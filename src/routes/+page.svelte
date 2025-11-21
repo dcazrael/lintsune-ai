@@ -1,5 +1,6 @@
 <script lang="ts">
   import { CsvUploader, DiffList, PayloadPanel } from "$lib";
+  import LintsuneText from "$lib/assets/Lintsune_text_light.svelte";
   import BatchControlsCard from "$lib/components/BatchControlsCard.svelte";
   import StatCard from "$lib/components/StatCard.svelte";
   import ThemeToggleButton from "$lib/components/ThemeToggleButton.svelte";
@@ -81,7 +82,7 @@
   <header class="panel panel-hero">
     <div class="grid grid-cols-3 items-start justify-between gap-6">
       <div class="max-w-2xl space-y-3 col-span-2">
-        <p class="text-sm font-semibold uppercase tracking-[0.3em] text-muted">Lintsune AI</p>
+        <LintsuneText classes="h-24" />
         <h1 class="text-3xl font-black leading-tight text-foreground">
           Batch smarter, diff faster.
         </h1>

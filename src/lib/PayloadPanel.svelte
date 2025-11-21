@@ -1,6 +1,4 @@
 <script lang="ts">
-  import JsonViewer from "./components/JsonViewer.svelte";
-
   let {
     payloadJson = "",
     responseJson = "",
@@ -9,7 +7,6 @@
     responseError = "",
     onGenerate,
     onResponseChange,
-    onParse,
   } = $props<{
     payloadJson?: string;
     responseJson?: string;
@@ -21,6 +18,7 @@
     onParse?: () => void;
   }>();
   let copyFeedback = $state("");
+  let responseEditor: HTMLDivElement | null = null;
 
   const responsePlaceholder = '{"rows": [{"index": 1, "target_revised": "..."}]}';
 
@@ -31,13 +29,18 @@
   }
 
   function handleResponseInput(event: Event) {
-    const value = (event.currentTarget as HTMLTextAreaElement).value ?? "";
+    const value = (event.currentTarget as HTMLDivElement).innerText ?? "";
     onResponseChange?.(value);
   }
 
-  function handleParse() {
-    if (!isParseDisabled) {
-      onParse?.();
+  async function handlePasteFromClipboard() {
+    if (isParseDisabled || typeof navigator === "undefined" || !responseEditor) return;
+    try {
+      const text = await navigator.clipboard.readText();
+      responseEditor.innerText = text;
+      onResponseChange?.(text);
+    } catch (error) {
+      console.error("Failed to read clipboard", error);
     }
   }
 
@@ -72,16 +75,10 @@
       </div>
     </div>
 
-    <JsonViewer
-      data={payloadJson}
-      spaces={2}
-      class="h-60 overflow-auto rounded-2xl border border-stroke/60 bg-panel p-3 font-mono text-sm text-foreground"
-    />
-    <textarea
-      class="input-field mt-2 h-60 font-mono"
-      value={payloadJson}
-      readonly
-    ></textarea>
+    <pre
+      class="input-field mt-2 h-60 font-mono bg-panel overflow-auto whitespace-pre-wrap"
+      aria-readonly="true"
+    >{payloadJson}</pre>
     <div class="flex justify-between items-center">
       <p class="mt-2 text-xs text-muted">
         Copy this JSON and paste it into your ChatGPT conversation as input.
@@ -101,24 +98,28 @@
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 class="text-lg font-semibold text-foreground">ChatGPT response</h2>
-        <p class="text-sm text-muted">Paste the JSON response here and parse it.</p>
+        <p class="text-sm text-muted">Paste the JSON response here or drop it in from your clipboard.</p>
       </div>
       <button
         class="btn btn-primary"
         type="button"
         disabled={isParseDisabled}
-        onclick={handleParse}
+        onclick={handlePasteFromClipboard}
       >
-        Parse response
+        Paste from clipboard
       </button>
     </div>
 
-    <textarea
-      class="input-field mt-2 h-60 bg-panel font-mono"
-      placeholder={responsePlaceholder}
-      value={responseJson}
+    <div
+      class="input-field mt-2 h-60 bg-panel font-mono overflow-auto whitespace-pre-wrap"
+      contenteditable="true"
+      bind:this={responseEditor}
+      role="textbox"
+      spellcheck="false"
+      aria-label="Paste ChatGPT JSON response"
+      data-placeholder={responsePlaceholder}
       oninput={handleResponseInput}
-    ></textarea>
+    >{responseJson}</div>
     {#if responseError}
       <p
         class="mt-2 rounded-2xl border border-red-300/60 bg-red-500/10 px-3 py-2 text-sm text-red-600"
@@ -128,3 +129,12 @@
     {/if}
   </section>
 </div>
+
+<style>
+  :global([contenteditable][data-placeholder]:empty:before) {
+    content: attr(data-placeholder);
+    color: rgb(107 114 128);
+    opacity: 0.75;
+    pointer-events: none;
+  }
+</style>
