@@ -1,5 +1,5 @@
 <script lang="ts">
-  import favicon from "$lib/assets/favicon.svg";
+  import favicon from "$lib/assets/Lintsune_logo_hairline.svg";
   import "../app.css";
 
   let { children } = $props();
