@@ -80,19 +80,23 @@
 
 <div class="space-y-6">
   <header class="panel panel-hero">
-    <div class="grid grid-cols-3 items-start justify-between gap-6">
-      <div class="max-w-2xl space-y-3 col-span-2">
-        <LintsuneText classes="h-24" />
-        <h1 class="text-3xl font-black leading-tight text-foreground">
-          Batch smarter, diff faster.
-        </h1>
-        <p class="text-sm text-muted">
-          Upload translation rows, craft JSON payloads, and visualize word-level diffs for every
-          revision without leaving the browser.
-        </p>
+    <div
+      class="grid grid-cols-3 items-start justify-between gap-6 grid-rows-[calc(var(--spacing) * 40)_1fr)]"
+    >
+      <div class="col-span-3 flex gap-6 items-center justify-center">
+        <LintsuneText classes="h-40" />
+        <div>
+          <h1 class="text-4xl font-black leading-tight text-foreground bruno-ace-sc-regular">
+            Batch smarter, diff faster.
+          </h1>
+          <p class="text-base text-muted">
+            Upload translation rows, craft JSON payloads, and visualize word-level diffs for every
+            revision without leaving the browser.
+          </p>
+        </div>
       </div>
 
-      <div class="grid">
+      <div class="absolute top-3 right-3">
         <ThemeToggleButton
           theme={theme.theme}
           onclick={theme.toggle}
