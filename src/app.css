@@ -4,7 +4,8 @@
 
 /* Light mode tokens */
 @theme {
-  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    sans-serif;
 
   /* Dracula-inspired palette */
   --background: #f8f8f2;
@@ -45,7 +46,6 @@
   --color-selection: var(--selection);
 }
 
-
 @layer base {
   :root {
     font-family: var(--font-sans);
@@ -53,7 +53,11 @@
 
   body {
     @apply bg-canvas text-foreground antialiased min-h-screen;
-    background-image: radial-gradient(circle at top, color-mix(in srgb, var(--color-accent) 24%, transparent) 0%, transparent 55%);
+    background-image: radial-gradient(
+      circle at top,
+      color-mix(in srgb, var(--color-accent) 24%, transparent) 0%,
+      transparent 55%
+    );
   }
 
   button:focus-visible,
@@ -66,12 +70,22 @@
     background-color: var(--color-selection);
     color: var(--color-foreground);
   }
+
+  .bruno-ace-sc-regular {
+    font-family: "Bruno Ace SC", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
 }
 
 @layer components {
   .panel {
     @apply border border-stroke/70 bg-panel/95 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.25)] ring-1 ring-white/5 backdrop-blur;
-    background-image: linear-gradient(130deg, color-mix(in srgb, var(--color-accent) 10%, transparent) 0%, transparent 60%);
+    background-image: linear-gradient(
+      130deg,
+      color-mix(in srgb, var(--color-accent) 10%, transparent) 0%,
+      transparent 60%
+    );
   }
 
   .panel-hero {
@@ -82,7 +96,11 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top right, color-mix(in srgb, var(--color-accent) 25%, transparent), transparent 60%);
+    background: radial-gradient(
+      circle at top right,
+      color-mix(in srgb, var(--color-accent) 25%, transparent),
+      transparent 60%
+    );
     opacity: 0.7;
     pointer-events: none;
   }
@@ -93,7 +111,11 @@
   }
 
   .panel-muted {
-    background-image: linear-gradient(145deg, color-mix(in srgb, var(--color-panel-muted) 90%, transparent) 0%, color-mix(in srgb, var(--color-panel) 80%, transparent) 80%);
+    background-image: linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--color-panel-muted) 90%, transparent) 0%,
+      color-mix(in srgb, var(--color-panel) 80%, transparent) 80%
+    );
     @apply border-stroke/50;
   }
 
@@ -124,5 +146,4 @@
   .input-field {
     @apply w-full rounded-2xl border border-stroke/60 bg-panel-muted px-4 py-3 text-sm font-medium text-foreground shadow-inner shadow-black/5 transition placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent;
   }
-
 }
